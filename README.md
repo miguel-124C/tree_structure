@@ -2,6 +2,9 @@
 
 # Steps to running project localhost
 
+0. Clone to project
+```https://github.com/miguel-124C/tree_structure```
+
 1. Created environment virtual
 ``` python -m venv venv ```
 
