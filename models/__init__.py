@@ -14,6 +14,6 @@ def main():
    a.insert(7)
    a.insert(12)
    a.insert(17)
-   a.recorrer(a.raiz)
+   a.in_orden(a.raiz)
 if __name__=='__main__':
    main()

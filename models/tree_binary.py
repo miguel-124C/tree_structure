@@ -12,21 +12,21 @@ class TreeBinary:
         nuevo=Node()
         nuevo.set_element(ele)
 
-        if self.raiz==None:
-            self.raiz=nuevo 
+        if self.raiz == None:
+            self.raiz = nuevo 
         else:
-            aux=self.raiz
-            while aux!=None:
+            aux = self.raiz
+            while aux != None:
                 padre=aux
-                if(ele<aux.get_element()):
-                    aux=aux.get_son_left()
+                if(ele < aux.get_element()):
+                    aux = aux.get_son_left()
                 else:
-                    aux=aux.get_son_right()
+                    aux = aux.get_son_right()
 
-                if padre.get_element()>nuevo.get_element():
-                    padre.left=nuevo
-                else:
-                    padre.right=nuevo
+            if padre.get_element() > nuevo.get_element():
+                padre.left = nuevo
+            else:
+                padre.right = nuevo
 
     def is_empty(self):
         """ Check if the tree is empty """
