@@ -2,7 +2,7 @@ from node import Node
 
 class TreeBinary:
     def __init__(self):
-        self.raiz=None
+        self.root=None
 
     def insert(self,ele):
         """
@@ -12,10 +12,10 @@ class TreeBinary:
         nuevo=Node()
         nuevo.set_element(ele)
 
-        if self.raiz == None:
-            self.raiz = nuevo 
+        if self.root == None:
+            self.root = nuevo 
         else:
-            aux = self.raiz
+            aux = self.root
             while aux != None:
                 padre=aux
                 if(ele < aux.get_element()):
@@ -30,15 +30,15 @@ class TreeBinary:
 
     def is_empty(self):
         """ Check if the tree is empty """
-        return self.raiz == None
+        return self.root == None
 
     def is_sheet(self,node):
         """ Check if the node is a sheet """
         return node.get_son_left() == None and node.get_son_right()==None
 
-    def buscar_x(self,ele):
+    def search(self,ele):
         """ Search for an element in the binary tree """
-        aux = self.raiz
+        aux = self.root
         while aux != None:
             if aux.get_element() == ele:
                 return True
@@ -47,6 +47,37 @@ class TreeBinary:
             else:
                 aux = aux.get_son_right()
         return False
+
+    def height(self, node=None):
+        """ Calculate the height of the tree """
+        if node is None:
+            node = self.root
+            return 0
+        return 1 + max(self.height(node.get_son_left()), self.height(node.get_son_right()))
+
+    def amount(self, node=None):
+        """ Calculate the amount of nodes in the tree """
+        if node is None:
+            node = self.root
+            return 0
+        return 1 + self.amount(node.get_son_left()) + self.amount(node.get_son_right())
+
+    def amplitude(self):
+        """ Calculate the maximum width of the tree """
+        if self.root is None:
+            return 0
+        queue = [self.root]
+        max_width = 0
+        while queue:
+            width = len(queue)
+            max_width = max(max_width, width)
+            for _ in range(width):
+                node = queue.pop(0)
+                if node.get_son_left():
+                    queue.append(node.get_son_left())
+                if node.get_son_right():
+                    queue.append(node.get_son_right())
+        return max_width
 
     """
         2
