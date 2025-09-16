@@ -1,12 +1,16 @@
-
 from flask import Flask
-from controllers.home_controller import index, tree
+from controllers.home_controller import home_bp
+from controllers.tree_controller import tree_bp
 
-app = Flask(__name__)
-
-# Registrar rutas
-app.add_url_rule("/", view_func=index)
-app.add_url_rule("/tree", view_func=tree)
+def create_app():
+    app = Flask(__name__)
+    
+    # Registrar blueprints
+    app.register_blueprint(tree_bp, url_prefix='/tree')
+    app.register_blueprint(home_bp, url_prefix='/')
+    
+    return app
 
 if __name__ == "__main__":
+    app = create_app()
     app.run(host='0.0.0.0', port=8000, debug=True)

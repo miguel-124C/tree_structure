@@ -1,6 +1,7 @@
-from node import Node
+from .node import Node
 
 class TreeBinary:
+
     def __init__(self):
         self.root=None
 

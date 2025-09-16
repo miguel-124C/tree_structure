@@ -15,5 +15,8 @@
 - 2. In Linux/Mac
 ``` source venv/bin/activate ```
 
-3. Execute app
+3. Install dependecies
+``` pip install -r requirements.txt ```
+
+4. Execute app
 ``` py app.py ```
