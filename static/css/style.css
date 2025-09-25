@@ -4,6 +4,7 @@
     --secondary-color: #6c757d;
     --success-color: #28a745;
     --danger-color: #dc3545;
+    --info-color: #35dcce;
     --light-bg: #f8f9fa;
     --dark-bg: #343a40;
 }
@@ -179,38 +180,6 @@ body {
     color: var(--primary-color);
 }
 
-/* Visualización del árbol */
-.tree-container {
-    text-align: center;
-    padding: 2rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    min-height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.node {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    background: var(--primary-color);
-    color: white;
-    border-radius: 50%;
-    margin: 10px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-}
-
-.node:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
 /* Resultados de recorrido */
 .traversal-result {
     background: #f8f9fa;
@@ -248,9 +217,15 @@ body {
 }
 
 .alert-error {
-    background: #f8d7da;
+    background: #721c24;
     border-color: var(--danger-color);
-    color: #721c24;
+    color: #f8d7da;
+}
+
+.alert-info {
+    background: #8a8686;
+    border-color: var(--info-color);
+    color: #ffffff;
 }
 
 /* Utilidades */
@@ -258,26 +233,6 @@ body {
 .mt-2 { margin-top: 2rem; }
 .mb-2 { margin-bottom: 2rem; }
 .hidden { display: none; }
-
-
-
-
-/* Spinner de carga */
-.spinner-border {
-    width: 3rem;
-    height: 3rem;
-    margin: 1rem auto;
-    display: block;
-}
-
-/* Mejoras para la visualización del árbol */
-.tree-visualization {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin: 1rem 0;
-}
 
 .tree-controls {
     display: flex;
@@ -289,40 +244,6 @@ body {
 .tree-controls button {
     flex: 1;
     min-width: 120px;
-}
-
-.tree-image-container {
-    text-align: center;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 2px dashed #ddd;
-}
-
-.tree-image-container img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-}
-
-/* Estados de carga */
-.loading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

@@ -1,6 +1,6 @@
 from flask import Flask
 from controllers.home_controller import home_bp
-from controllers.tree_controller import tree_bp
+from controllers.treeBB_controller import tree_bp
 
 def create_app():
     app = Flask(__name__)

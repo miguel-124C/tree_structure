@@ -4,6 +4,7 @@ class TreeBinary:
 
     def __init__(self):
         self.root=None
+        self.elements = []
 
     def insert(self,ele):
         """
@@ -89,8 +90,10 @@ class TreeBinary:
     def in_orden(self, node):
         if node is not None:
             self.in_orden(node.get_son_left())
-            print(node.get_element())
+            self.elements.append(node.get_element())
             self.in_orden(node.get_son_right())
+        
+        return self.elements
 
     """
         2
@@ -101,7 +104,9 @@ class TreeBinary:
         if node is not None:
             self.post_orden(node.get_son_left())
             self.post_orden(node.get_son_right())
-            print(node.get_element())
+            self.elements.append( node.get_element() )
+        
+        return self.elements
 
     """
         2
@@ -110,6 +115,8 @@ class TreeBinary:
     """
     def pre_orden(self, node):
         if node is not None:
-            print(node.get_element())
+            self.elements.append( node.get_element() )
             self.pre_orden(node.get_son_left())
             self.pre_orden(node.get_son_right())
+        
+        return self.elements

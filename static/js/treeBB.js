@@ -5,10 +5,12 @@ const API_BASE = '/tree';
 let elements = {
     insertInput: null,
     searchInput: null,
-    treeContainer: null,
     traversalResult: null,
-    stats: null
+    stats: null,
+    canvas: null,
 };
+
+let ctx;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
@@ -21,19 +23,20 @@ function initializeElements() {
     elements = {
         insertInput: document.getElementById('insertElement'),
         searchInput: document.getElementById('searchElement'),
-        treeContainer: document.getElementById('treeContainer'),
         traversalResult: document.getElementById('traversalResult'),
         stats: {
             height: document.getElementById('height'),
             amount: document.getElementById('amount'),
             amplitude: document.getElementById('amplitude'),
             isEmpty: document.getElementById('isEmpty')
-        }
+        },
+        canvas: document.getElementById('canvas')
     };
+
+    ctx = elements.canvas.getContext('2d');
 }
 
 function attachEventListeners() {
-    // Event listeners para inputs
     if (elements.insertInput) {
         elements.insertInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') insertElement();
@@ -122,16 +125,26 @@ async function traverse(order) {
 }
 
 async function updateStats() {
-    const result = await apiCall('/stats');
-    
-    if (result.success) {
-        const { height, amount, amplitude, is_empty } = result.data;
-        
+    const stats = await getStats();
+
+    if (stats) {
+        const { height, amount, amplitude, is_empty } = stats;
+
         if (elements.stats.height) elements.stats.height.textContent = height;
         if (elements.stats.amount) elements.stats.amount.textContent = amount;
         if (elements.stats.amplitude) elements.stats.amplitude.textContent = amplitude;
         if (elements.stats.isEmpty) elements.stats.isEmpty.textContent = is_empty ? 'Sí' : 'No';
     }
+}
+
+async function getStats() {
+    const result = await apiCall('/stats');
+    if (result.success) {
+        const { height, amount, amplitude, is_empty } = result.data;
+        return { height, amount, amplitude, is_empty };
+    }
+
+    return null;
 }
 
 async function clearTree() {
@@ -146,7 +159,7 @@ async function clearTree() {
     if (result.success) {
         showAlert('Árbol reiniciado correctamente', 'success');
         updateStats();
-        clearTreeVisualization();
+        clearTreeVisualization(true);
         clearTraversalResult();
     }
 }
@@ -166,15 +179,16 @@ function showAlert(message, type = 'info') {
     `;
     
     document.body.appendChild(alertDiv);
-    
-    // Remover después de 5 segundos
+
     setTimeout(() => {
         alertDiv.remove();
-    }, 5000);
+    }, 1000);
 }
 
-function showTraversalResult(elements, order) {
-    if (!elements.traversalResult) return;
+function showTraversalResult(e, order) {
+    console.log(e);
+    
+    if (!e) return;
     
     const orderNames = {
         'inorden': 'In-Orden',
@@ -186,7 +200,7 @@ function showTraversalResult(elements, order) {
         <div class="traversal-result">
             <h3>Recorrido ${orderNames[order]}:</h3>
             <div class="traversal-path">
-                ${elements.join(' → ')}
+                ${e.join(' → ')}
             </div>
         </div>
     `;
@@ -198,66 +212,68 @@ function clearTraversalResult() {
     }
 }
 
-function updateTreeVisualization() {
-    // Mostrar la imagen del árbol
-    const timestamp = new Date().getTime(); // Para evitar cache
-    const treeImg = document.createElement('img');
-    treeImg.src = `/tree/tree-image?t=${timestamp}`;
-    treeImg.alt = 'Visualización del árbol binario';
-    treeImg.style.maxWidth = '100%';
-    treeImg.style.border = '2px solid #ddd';
-    treeImg.style.borderRadius = '8px';
-    
-    // Agregar spinner de carga
-    elements.treeContainer.innerHTML = `
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p>Cargando visualización...</p>
-        </div>
-    `;
-    
-    // Cuando la imagen se carga, reemplazar el spinner
-    treeImg.onload = function() {
-        elements.treeContainer.innerHTML = '';
-        elements.treeContainer.appendChild(treeImg);
-        
-        // Agregar botón de actualización
-        const refreshBtn = document.createElement('button');
-        refreshBtn.className = 'btn btn-secondary mt-2';
-        refreshBtn.innerHTML = '🔄 Actualizar Visualización';
-        refreshBtn.onclick = updateTreeVisualization;
-        elements.treeContainer.appendChild(refreshBtn);
-    };
-    
-    treeImg.onerror = function() {
-        elements.treeContainer.innerHTML = `
-            <div class="alert alert-error">
-                Error al cargar la visualización del árbol
-            </div>
-            <button class="btn btn-primary mt-2" onclick="updateTreeVisualization()">
-                Reintentar
-            </button>
-        `;
-    };
-}
+async function updateTreeVisualization() {
+    const result = await apiCall('/tree-data');
+    if( result.success ) {
+        const { empty, root } = result.data;
+        if (empty) {
+            clearTreeVisualization(true);
+            return;
+        };
 
-function clearTreeVisualization() {
-    if (elements.treeContainer) {
-        elements.treeContainer.innerHTML = `
-            <div class="text-center">
-                <p>El árbol está vacío</p>
-                <img src="/static/images/empty-tree.png" alt="Árbol vacío" 
-                     style="max-width: 200px; opacity: 0.5;">
-            </div>
-        `;
+        const x = elements.canvas.width / 2;
+        const y = 15;
+
+        clearTreeVisualization();
+        const drawLines = (x1, y1, x2, y2)=> {
+            ctx.lineWith = 2;
+            ctx.fillStyle = 'white';
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        const drawNodes =({ left, right, value }, x, y, xPrev = null, yPrev = null)=> {
+            ctx.beginPath();
+            ctx.fillStyle = 'white';
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.font = '8px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText(value, x - 5, y + 5);
+
+            if (left) {
+                ctx.beginPath();
+                setTimeout(() => {
+                    drawNodes(left, x - 20, y + 20, xPrev, yPrev);
+                    drawLines(x - 10, y, x - 15, y + 10);
+                }, 250);
+            }
+            if (right) {
+                ctx.beginPath();
+                setTimeout(() => {
+                    drawNodes(right, x + 20, y + 20, xPrev, yPrev);
+                    drawLines(x + 10, y, x + 15, y + 10);
+                }, 250);
+            }
+        }
+
+        console.log(root);
+        drawNodes(root, x, y);
     }
 }
 
-// Exportar funciones para uso global
-window.insertElement = insertElement;
-window.searchElement = searchElement;
-window.traverse = traverse;
-window.clearTree = clearTree;
-window.updateStats = updateStats;
+function clearTreeVisualization( treeEmpty = false ) {
+    ctx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+    ctx.fillStyle = '#45abbdff';
+    ctx.fillRect(0, 0, elements.canvas.width, elements.canvas.height);
+
+    if( treeEmpty ) {
+        ctx.beginPath();
+        ctx.font = '16px Arial';
+        ctx.fillStyle = 'black';
+        ctx.fillText('Árbol vacio', 50, 50);
+    }
+}
