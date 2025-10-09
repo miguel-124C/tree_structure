@@ -121,3 +121,26 @@ def tree_data():
     }
     
     return jsonify(tree_data)
+
+@tree_bp.route('/delete/<element>', methods=['DELETE'])
+def delete_node(element):
+    try:
+        if treeB.is_empty():
+            return jsonify({'error': 'Árbol vacio'}), 400
+            
+        if element is None:
+            return jsonify({'error': 'Element required'}), 400
+
+        # Convertir a número si es posible
+        try:
+            element = float(element) if '.' in element else int(element)
+        except ValueError:
+            pass  # Mantener como string si no es número
+        
+        result = treeB.eliminar(element)
+        if result :
+            return jsonify({'message': 'Elemento se eliminó correctamente'})
+        else :
+            return jsonify({'message': 'No se eliminó correctamente'})
+    except Exception as elements:
+        return jsonify({'error': str(elements)}), 500

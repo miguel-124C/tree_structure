@@ -120,3 +120,66 @@ class TreeBinary:
             self.pre_orden(node.get_son_right())
         
         return self.elements
+    
+    def _min_value_node(self, node):
+        """
+        Encuentra el nodo con el valor más pequeño en un subárbol (Sucesor Inmediato).
+        """
+        current = node
+        while current.get_son_left() is not None:
+            current = current.get_son_left()
+        return current
+
+    def _eliminar_recursivo(self, root, ele):
+        """
+        Función auxiliar recursiva para la eliminación de nodos.
+        """
+        # 1. Caso Base: Árbol vacío o elemento no encontrado
+        if root is None:
+            return root
+
+        # 2. Navegación: Recorre el árbol
+        current_element = root.get_element()
+        if ele < current_element:
+            # Eliminar en subárbol izquierdo
+            root.set_son_left(self._eliminar_recursivo(root.get_son_left(), ele))
+        elif ele > current_element:
+            # Eliminar en subárbol derecho
+            root.set_son_right(self._eliminar_recursivo(root.get_son_right(), ele))
+        else:
+            # ¡El nodo a eliminar es 'root'!
+
+            # 3. Caso 1 & 2: Nodo con 0 o 1 hijo
+            if root.get_son_left() is None:
+                # Retorna el hijo derecho (puede ser None)
+                temp = root.get_son_right()
+                return temp
+            elif root.get_son_right() is None:
+                # Retorna el hijo izquierdo
+                temp = root.get_son_left()
+                return temp
+
+            # 4. Caso 3: Nodo con 2 hijos
+            # Obtener el sucesor inmediato
+            temp = self._min_value_node(root.get_son_right())
+
+            # Copiar el contenido del sucesor en este nodo (reemplazo)
+            root.set_element(temp.get_element())
+
+            # Eliminar el sucesor del subárbol derecho
+            root.set_son_right(self._eliminar_recursivo(root.get_son_right(), temp.get_element()))
+
+        return root
+        
+    def eliminar(self, ele):
+        """
+        Método público para eliminar un elemento del árbol.
+        """
+        if self.root is None:
+            return False # Árbol vacío
+            
+        old_root = self.root
+        self.root = self._eliminar_recursivo(self.root, ele)
+        
+        # Una forma simple de verificar si se eliminó (podría mejorarse)
+        return self.root != old_root or self.search(ele) == False
