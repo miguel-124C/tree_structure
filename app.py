@@ -6,7 +6,7 @@ def create_app():
     app = Flask(__name__)
     
     # Registrar blueprints
-    app.register_blueprint(tree_bp, url_prefix='/tree')
+    app.register_blueprint(tree_bp, url_prefix='/tree-binary')
     app.register_blueprint(home_bp, url_prefix='/')
     
     return app
