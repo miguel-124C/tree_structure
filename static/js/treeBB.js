@@ -1,9 +1,10 @@
 // Configuración de endpoints
-const API_BASE = '/tree';
+const API_BASE = '/tree-binary';
 
 // Elementos DOM
 let elements = {
     insertInput: null,
+    deleteInput: null,
     searchInput: null,
     traversalResult: null,
     stats: null,
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeElements() {
     elements = {
         insertInput: document.getElementById('insertElement'),
+        deleteInput: document.getElementById('deleteElement'),
         searchInput: document.getElementById('searchElement'),
         traversalResult: document.getElementById('traversalResult'),
         stats: {
@@ -46,6 +48,12 @@ function attachEventListeners() {
     if (elements.searchInput) {
         elements.searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') searchElement();
+        });
+    }
+
+    if (elements.deleteInput) {
+        elements.deleteInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') deleteElement();
         });
     }
 }
@@ -91,6 +99,25 @@ async function insertElement() {
     if (result.success) {
         showAlert('Elemento insertado correctamente', 'success');
         elements.insertInput.value = '';
+        updateStats();
+        updateTreeVisualization();
+    }
+}
+
+async function deleteElement() {
+    const element = elements.deleteInput?.value.trim();
+    if (!element) {
+        showAlert('Por favor ingrese un elemento', 'error');
+        return;
+    }
+
+    const result = await apiCall(`/delete/${element}`, {
+        method: 'DELETE'
+    });
+
+    if (result.success) {
+        showAlert(result.data.message, 'success');
+        elements.deleteInput.value = '';
         updateStats();
         updateTreeVisualization();
     }
