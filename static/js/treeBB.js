@@ -30,7 +30,9 @@ function initializeElements() {
             height: document.getElementById('height'),
             amount: document.getElementById('amount'),
             amplitude: document.getElementById('amplitude'),
-            isEmpty: document.getElementById('isEmpty')
+            isEmpty: document.getElementById('isEmpty'),
+            hasEspejos: document.getElementById('hasEspejos'),
+            numEspejos: document.getElementById('numEspejos')
         },
         canvas: document.getElementById('canvas')
     };
@@ -155,20 +157,32 @@ async function updateStats() {
     const stats = await getStats();
 
     if (stats) {
-        const { height, amount, amplitude, is_empty } = stats;
+        const { height, amount, amplitude, is_empty, espejos } = stats;
+
+        let pre = '';
+        for (const element of espejos) {
+            pre += `Nivel ${element[2]}: ${element[0]} - ${element[1]} | `
+        }
 
         if (elements.stats.height) elements.stats.height.textContent = height;
         if (elements.stats.amount) elements.stats.amount.textContent = amount;
         if (elements.stats.amplitude) elements.stats.amplitude.textContent = amplitude;
         if (elements.stats.isEmpty) elements.stats.isEmpty.textContent = is_empty ? 'Sí' : 'No';
+        if (elements.stats.numEspejos) elements.stats.numEspejos.textContent = espejos.length;
+        if (elements.stats.hasEspejos) elements.stats.hasEspejos.innerHTML = `
+            <pre>
+                ${pre}
+            </pre>
+        `;
     }
 }
 
 async function getStats() {
     const result = await apiCall('/stats');
     if (result.success) {
-        const { height, amount, amplitude, is_empty } = result.data;
-        return { height, amount, amplitude, is_empty };
+        const { height, amount, amplitude, is_empty, espejos } = result.data;
+        
+        return { height, amount, amplitude, is_empty, espejos };
     }
 
     return null;

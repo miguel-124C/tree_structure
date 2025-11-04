@@ -2,9 +2,11 @@
 class Node:
     '''Method constructor'''
     def __init__(self):
-        self.left=None
-        self.right=None
+        self.left: Node=None
+        self.right: Node=None
         self.element=0
+        self.has_espejo=False
+        self.espejo: Node = None
 
     '''@getters'''
     def get_element(self):

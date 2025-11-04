@@ -84,7 +84,8 @@ def get_stats():
             'height': treeB.height(treeB.root),
             'amount': treeB.amount(treeB.root),
             'amplitude': treeB.amplitude(),
-            'is_empty': treeB.is_empty()
+            'is_empty': treeB.is_empty(),
+            'espejos': treeB.get_espejos()
         }
         return jsonify(stats)
     

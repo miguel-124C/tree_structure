@@ -5,6 +5,7 @@ class TreeBinary:
     def __init__(self):
         self.root=None
         self.elements = []
+        self.espejos = []
 
     def insert(self,ele):
         """
@@ -18,17 +19,79 @@ class TreeBinary:
             self.root = nuevo 
         else:
             aux = self.root
+            nivel = 0
             while aux != None:
                 padre=aux
+                nivel = nivel +1
                 if(ele < aux.get_element()):
                     aux = aux.get_son_left()
                 else:
                     aux = aux.get_son_right()
 
+            print(nivel)
             if padre.get_element() > nuevo.get_element():
                 padre.left = nuevo
+                self.set_espejo(padre, True, nivel)
             else:
                 padre.right = nuevo
+                self.set_espejo(padre, False, nivel)
+
+    def set_espejo(self, parent: Node, direction: bool, nivel: int):
+        if parent.get_element() == self.root.get_element():
+            """True: direccion Der, False: direccion Izq"""
+            if direction and self.root.get_son_right():
+                self.set_parent_espejos(parent, self.root, direction, nivel)
+            else:
+                if not direction and self.root.get_son_left():
+                    self.set_parent_espejos(parent, self.root, direction, nivel)
+        else:
+            if not parent.has_espejo: return False
+
+            if direction and parent.espejo.get_son_right():
+                self.set_parent_espejos(parent, parent.espejo, not direction, nivel)
+            else:
+                if not direction and parent.espejo.get_son_left():
+                    self.set_parent_espejos(parent, parent.espejo, not direction, nivel)
+        
+
+    def set_parent_espejos(self, parent: Node, parent_espejo: Node, dir: bool, nivel: int):
+        if dir:
+            parent.get_son_right().has_espejo = True
+            parent_espejo.get_son_left().has_espejo = True
+            parent.get_son_right().espejo = parent_espejo.get_son_left()
+            parent_espejo.get_son_left().espejo = parent.get_son_right()
+            self.espejos.append(
+                [parent_espejo.get_son_left().element, parent.get_son_right().element, nivel]
+            )
+        else:
+            parent_espejo.get_son_right().has_espejo = True
+            parent.get_son_left().has_espejo = True
+            parent_espejo.get_son_right().espejo = parent.get_son_left()
+            parent.get_son_left().espejo = parent_espejo.get_son_right()
+            self.espejos.append(
+                [parent.get_son_left().element, parent_espejo.get_son_right().element, nivel]
+            )
+
+    def get_espejos(self):
+        return self.espejos
+    
+    def del_espejo(self, node):
+        index = 0
+        for e in self.espejos:
+            if node.get_element() == e[0] or node.get_element() == e[1]:
+                self.espejos.pop(index)
+            index = index+1
+
+    def modify_espejo(self, ele, node):
+        index = 0
+        for e in self.espejos:
+            if ele == e[0]:
+                self.espejos[index][0] = node.get_element()
+                break
+            if ele == e[1]:
+                self.espejos[index][1] = node.get_element()
+                break
+            index = index+1
 
     def is_empty(self):
         """ Check if the tree is empty """
@@ -153,10 +216,20 @@ class TreeBinary:
             if root.get_son_left() is None:
                 # Retorna el hijo derecho (puede ser None)
                 temp = root.get_son_right()
+                if temp:
+                    self.del_espejo(temp)
+                    self.modify_espejo(root.get_element(), temp)
+                if root.has_espejo:
+                    self.del_espejo(root)
                 return temp
             elif root.get_son_right() is None:
                 # Retorna el hijo izquierdo
                 temp = root.get_son_left()
+                if temp:
+                    self.del_espejo(temp)
+                    self.modify_espejo(root.get_element(), temp)
+                if root.has_espejo:
+                    self.del_espejo(root)
                 return temp
 
             # 4. Caso 3: Nodo con 2 hijos
